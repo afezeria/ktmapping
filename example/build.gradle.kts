@@ -17,9 +17,9 @@ configure<com.bnorm.power.PowerAssertGradleExtension> {
 dependencies {
     implementation("org.springframework:spring-context:5.3.9")
     implementation(projects.ktmapping)
-    implementation(projects.proc)
     ksp(projects.proc)
 
+    testImplementation(projects.proc)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-jdbc")
     testImplementation(kotlin("test-common"))
