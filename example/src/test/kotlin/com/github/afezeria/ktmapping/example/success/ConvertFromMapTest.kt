@@ -54,6 +54,7 @@ class A(val account: String, var name: String, var password: String) {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import kotlin.Any
 import kotlin.String
 import kotlin.collections.Map
@@ -62,14 +63,13 @@ import org.springframework.stereotype.Component
 @Component
 public class InterfaceTestImpl : InterfaceTest {
     public override fun abc(b: Map<String, Any>): A {
-        val result = A(requireNotNull(_get(b, "account")), requireNotNull(_get(b, "name")),
-                requireNotNull(_get(b, "password")))
-        result.id = _get(b, "id")
-        result.age = _get(b, "age")
-        result.createById = requireNotNull(_get(b, "createById"))
-        result.createDate = requireNotNull(_get(b, "createDate"))
-        result.name = requireNotNull(_get(b, "name"))
-        result.password = requireNotNull(_get(b, "password"))
+        val result = A(_get(b, "account"), _get(b, "name"), _get(b, "password"))
+        result.id = _getNullable(b, "id")
+        result.age = _getNullable(b, "age")
+        result.createById = _get(b, "createById")
+        result.createDate = _get(b, "createDate")
+        result.name = _get(b, "name")
+        result.password = _get(b, "password")
         return result
     }
 }
@@ -104,6 +104,7 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import kotlin.Any
 import kotlin.String
 import kotlin.collections.Map
@@ -112,14 +113,13 @@ import org.springframework.stereotype.Component
 @Component
 public class InterfaceTestImpl : InterfaceTest {
     public override fun abc(b: Map<String, Any>): A {
-        val result = A(requireNotNull(_get(b, "account")), requireNotNull(_get(b, "name") ?: _get(b,
-                "NICK_NAME")), requireNotNull(_get(b, "password")))
-        result.id = _get(b, "id")
-        result.age = _get(b, "age")
-        result.createById = requireNotNull(_get(b, "create_by_id") ?: _get(b, "createById"))
-        result.createDate = requireNotNull(_get(b, "create_date") ?: _get(b, "createDate"))
-        result.name = requireNotNull(_get(b, "name") ?: _get(b, "NICK_NAME"))
-        result.password = requireNotNull(_get(b, "password"))
+        val result = A(_get(b, "account"), _get(b, "name", "NICK_NAME"), _get(b, "password"))
+        result.id = _getNullable(b, "id")
+        result.age = _getNullable(b, "age")
+        result.createById = _get(b, "create_by_id", "createById")
+        result.createDate = _get(b, "create_date", "createDate")
+        result.name = _get(b, "name", "NICK_NAME")
+        result.password = _get(b, "password")
         return result
     }
 }
@@ -155,6 +155,7 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import kotlin.Any
 import kotlin.String
 import kotlin.collections.Map
@@ -163,10 +164,9 @@ import org.springframework.stereotype.Component
 @Component
 public class InterfaceTestImpl : InterfaceTest {
     public override fun bcd(b: Map<String, Any>): A {
-        val result = A(requireNotNull(_get(b, "Account")), requireNotNull(_get(b, "Name")),
-                requireNotNull(_get(b, "pw") ?: _get(b, "Passwd")))
-        result.name = requireNotNull(_get(b, "Name"))
-        result.password = requireNotNull(_get(b, "pw") ?: _get(b, "Passwd"))
+        val result = A(_get(b, "Account"), _get(b, "Name"), _get(b, "pw", "Passwd"))
+        result.name = _get(b, "Name")
+        result.password = _get(b, "pw", "Passwd")
         return result
     }
 }

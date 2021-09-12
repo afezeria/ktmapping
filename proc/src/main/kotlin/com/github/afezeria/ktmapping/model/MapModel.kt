@@ -35,6 +35,7 @@ class MapModel(varName: String, type: KSType, isSource: Boolean) :
     ): GetterInvokeInfo {
 
         ctx.fileSpecBuilder.addImport(MappingExt::class, "_get")
+        ctx.fileSpecBuilder.addImport(MappingExt::class, "_getNullable")
 
         var isNullable = true
         if (targetType.nullability == Nullability.NOT_NULL) {
@@ -43,9 +44,12 @@ class MapModel(varName: String, type: KSType, isSource: Boolean) :
         if (ctx.isUpdateFunction && ctx.updatePolicy == UpdatePolicy.SOURCE_IS_NOT_NULL) {
             isNullable = true
         }
-        val str = propertyNames.joinToString(" ?: ") {
-            "_get($varName, \"$it\")"
-        }.wrap(isNullable)
+        val str = if (isNullable) {
+            "_getNullable($varName, "
+        } else {
+            "_get($varName, "
+        } + propertyNames.joinToString(", ") { "\"$it\"" } + ")"
+
         return GetterInvokeInfo(str, emptyList(), isNullable)
     }
 

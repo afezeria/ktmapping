@@ -54,6 +54,7 @@ class A(val account: String, var name: String, var password: String) {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import kotlin.Any
 import kotlin.String
 import kotlin.Unit
@@ -63,12 +64,12 @@ import org.springframework.stereotype.Component
 @Component
 public class InterfaceTestImpl : InterfaceTest {
     public override fun abc(m: Map<String, Any>, a: A): Unit {
-        a.id = _get(m, "id")
-        a.age = _get(m, "age")
-        a.createById = requireNotNull(_get(m, "createById"))
-        a.createDate = requireNotNull(_get(m, "createDate"))
-        a.name = requireNotNull(_get(m, "name"))
-        a.password = requireNotNull(_get(m, "password"))
+        a.id = _getNullable(m, "id")
+        a.age = _getNullable(m, "age")
+        a.createById = _get(m, "createById")
+        a.createDate = _get(m, "createDate")
+        a.name = _get(m, "name")
+        a.password = _get(m, "password")
     }
 }
 
@@ -101,6 +102,7 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import kotlin.Any
 import kotlin.String
 import kotlin.Unit
@@ -110,12 +112,12 @@ import org.springframework.stereotype.Component
 @Component
 public class InterfaceTestImpl : InterfaceTest {
     public override fun u1(b: Map<String, Any>, a: A): Unit {
-        a.id = _get(b, "id")
-        a.age = _get(b, "age")
-        a.createById = requireNotNull(_get(b, "createById"))
-        a.createDate = requireNotNull(_get(b, "createDate"))
-        a.name = requireNotNull(_get(b, "name"))
-        a.password = requireNotNull(_get(b, "password"))
+        a.id = _getNullable(b, "id")
+        a.age = _getNullable(b, "age")
+        a.createById = _get(b, "createById")
+        a.createDate = _get(b, "createDate")
+        a.name = _get(b, "name")
+        a.password = _get(b, "password")
     }
 }
 
@@ -148,6 +150,7 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import java.time.LocalDateTime
 import kotlin.Any
 import kotlin.Int
@@ -159,27 +162,27 @@ import org.springframework.stereotype.Component
 @Component
 public class InterfaceTestImpl : InterfaceTest {
     public override fun u2(b: Map<String, Any>, a: A): Unit {
-        val idTmp: String? = _get(b, "id")
+        val idTmp: String? = _getNullable(b, "id")
         if (idTmp != null) {
             a.id = idTmp
         }
-        val ageTmp: Int? = _get(b, "age")
+        val ageTmp: Int? = _getNullable(b, "age")
         if (ageTmp != null) {
             a.age = ageTmp
         }
-        val createByIdTmp: String? = _get(b, "createById")
+        val createByIdTmp: String? = _getNullable(b, "createById")
         if (createByIdTmp != null) {
             a.createById = createByIdTmp
         }
-        val createDateTmp: LocalDateTime? = _get(b, "createDate")
+        val createDateTmp: LocalDateTime? = _getNullable(b, "createDate")
         if (createDateTmp != null) {
             a.createDate = createDateTmp
         }
-        val nameTmp: String? = _get(b, "name")
+        val nameTmp: String? = _getNullable(b, "name")
         if (nameTmp != null) {
             a.name = nameTmp
         }
-        val passwordTmp: String? = _get(b, "password")
+        val passwordTmp: String? = _getNullable(b, "password")
         if (passwordTmp != null) {
             a.password = passwordTmp
         }
@@ -216,6 +219,7 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import java.lang.reflect.Field
 import kotlin.Any
 import kotlin.String
@@ -234,22 +238,22 @@ public class InterfaceTestImpl : InterfaceTest {
     public override fun u3(b: Map<String, Any>, a: A): Unit {
         val idTmp = a.id
         if (idTmp == null) {
-            a.id = _get(b, "id")
+            a.id = _getNullable(b, "id")
         }
         val ageTmp = a.age
         if (ageTmp == null) {
-            a.age = _get(b, "age")
+            a.age = _getNullable(b, "age")
         }
         val createByIdTmp = com_github_afezeria_ktmapping_A_createById.get(a)
         if (createByIdTmp == null) {
-            a.createById = requireNotNull(_get(b, "createById"))
+            a.createById = _get(b, "createById")
         }
         val createDateTmp = com_github_afezeria_ktmapping_A_createDate.get(a)
         if (createDateTmp == null) {
-            a.createDate = requireNotNull(_get(b, "updateDate"))
+            a.createDate = _get(b, "updateDate")
         }
-        a.name = requireNotNull(_get(b, "name"))
-        a.password = requireNotNull(_get(b, "password"))
+        a.name = _get(b, "name")
+        a.password = _get(b, "password")
     }
 }
 
@@ -283,6 +287,7 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import java.lang.reflect.Field
 import kotlin.Any
 import kotlin.String
@@ -301,22 +306,22 @@ public class InterfaceTestImpl : InterfaceTest {
     public override fun u4(b: Map<String, Any>, a: A): Unit {
         val idTmp = a.id
         if (idTmp == null) {
-            a.id = _get(b, "id")
+            a.id = _getNullable(b, "id")
         }
         val ageTmp = a.age
         if (ageTmp == null) {
-            a.age = _get(b, "age")
+            a.age = _getNullable(b, "age")
         }
         val createByIdTmp = com_github_afezeria_ktmapping_A_createById.get(a)
         if (createByIdTmp == null) {
-            a.createById = requireNotNull(_get(b, "createById"))
+            a.createById = _get(b, "createById")
         }
         val createDateTmp = com_github_afezeria_ktmapping_A_createDate.get(a)
         if (createDateTmp == null) {
-            a.createDate = requireNotNull(_get(b, "createDate") ?: _get(b, "updateDate"))
+            a.createDate = _get(b, "createDate", "updateDate")
         }
-        a.name = requireNotNull(_get(b, "name"))
-        a.password = requireNotNull(_get(b, "password"))
+        a.name = _get(b, "name")
+        a.password = _get(b, "password")
     }
 }
 
@@ -350,6 +355,7 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import java.lang.reflect.Field
 import kotlin.Any
 import kotlin.String
@@ -365,7 +371,7 @@ public class InterfaceTestImpl : InterfaceTest {
     public override fun u5(b: Map<String, Any>, a: A): Unit {
         val createDateTmp = com_github_afezeria_ktmapping_A_createDate.get(a)
         if (createDateTmp == null) {
-            a.createDate = requireNotNull(_get(b, "updateDate"))
+            a.createDate = _get(b, "updateDate")
         }
     }
 }
@@ -399,6 +405,7 @@ package com.github.afezeria.ktmapping
 
 import JavaA
 import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
 import kotlin.Any
 import kotlin.String
 import kotlin.Unit
@@ -410,43 +417,43 @@ public class InterfaceTestImpl : InterfaceTest {
     public override fun ju1(b: Map<String, Any>, a: JavaA): Unit {
         val accountTmp = a.account
         if (accountTmp == null) {
-            a.account = _get(b, "account")
+            a.account = _getNullable(b, "account")
         }
         val nameTmp = a.name
         if (nameTmp == null) {
-            a.name = _get(b, "name")
+            a.name = _getNullable(b, "name")
         }
         val passwordTmp = a.password
         if (passwordTmp == null) {
-            a.password = _get(b, "password")
+            a.password = _getNullable(b, "password")
         }
         val idTmp = a.id
         if (idTmp == null) {
-            a.id = _get(b, "id")
+            a.id = _getNullable(b, "id")
         }
         val ageTmp = a.age
         if (ageTmp == null) {
-            a.age = _get(b, "age")
+            a.age = _getNullable(b, "age")
         }
         val addressTmp = a.address
         if (addressTmp == null) {
-            a.address = _get(b, "address")
+            a.address = _getNullable(b, "address")
         }
         val createByIdTmp = a.createById
         if (createByIdTmp == null) {
-            a.createById = _get(b, "createById")
+            a.createById = _getNullable(b, "createById")
         }
         val createDateTmp = a.createDate
         if (createDateTmp == null) {
-            a.createDate = _get(b, "createDate")
+            a.createDate = _getNullable(b, "createDate")
         }
         val modifyByIdTmp = a.modifyById
         if (modifyByIdTmp == null) {
-            a.modifyById = _get(b, "modifyById")
+            a.modifyById = _getNullable(b, "modifyById")
         }
         val modifyDateTmp = a.modifyDate
         if (modifyDateTmp == null) {
-            a.modifyDate = _get(b, "modifyDate")
+            a.modifyDate = _getNullable(b, "modifyDate")
         }
     }
 }
