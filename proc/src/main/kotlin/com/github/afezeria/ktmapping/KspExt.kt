@@ -111,7 +111,7 @@ fun getEnumEntry(type: KSType): Enum<*> {
             (type.declaration as KSClassDeclaration).parentDeclaration!!.qualifiedName!!.asString()
         ) as Class<Enum<*>>
     val enumConstants = enumClazz.enumConstants
-    return enumConstants.find { it.name == type.toString() }!!
+    return enumConstants.find { it.name == type.name }!!
 }
 
 
