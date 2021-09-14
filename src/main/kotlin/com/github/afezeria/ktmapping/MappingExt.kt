@@ -26,7 +26,7 @@ object MappingExt {
 
     inline fun <reified T : Any> _get(rs: ResultSet, vararg keys: String): T {
         return _getNullable(rs, *keys)
-            ?: throw MappingException("Required ${keys.joinToString(" or ")} is not null", null)
+            ?: throw MappingException("Required ${keys.joinToString(" or ")} was null", null)
     }
 
     inline fun <reified T : Any> _getNullable(map: Map<*, *>, vararg keys: String): T? {
@@ -44,6 +44,6 @@ object MappingExt {
 
     inline fun <reified T : Any> _get(map: Map<*, *>, vararg keys: String): T {
         return _getNullable(map, *keys)
-            ?: throw MappingException("Required ${keys.joinToString(" or ")} is not null", null)
+            ?: throw MappingException("Required ${keys.joinToString(" or ")} was null", null)
     }
 }

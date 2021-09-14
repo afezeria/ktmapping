@@ -11,6 +11,7 @@ configure<com.bnorm.power.PowerAssertGradleExtension> {
         "kotlin.test.assertTrue",
         "kotlin.test.assertEquals",
         "kotlin.test.assertContentEquals",
+        "kotlin.test.assertContains"
     )
 }
 
