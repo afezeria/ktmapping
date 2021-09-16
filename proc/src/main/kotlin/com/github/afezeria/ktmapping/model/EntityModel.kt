@@ -145,6 +145,10 @@ class EntityModel(varName: String, type: KSType, isSource: Boolean) :
         return GetterInvokeInfo(str, listOfNotNull(explicitType?.className()), isNullable)
     }
 
+    private fun String.wrap(ksType: KSType? = null): String {
+        return replace("(.*\\?:.*)".toRegex(), "(\$1)") + (ksType?.let { " as %T" } ?: "")
+    }
+
     private fun createGetterWithReflect(propertyName: String): String {
         val name = type.qualifierName.replace('.', '_') + '_' + propertyName
         ctx.reflectHelperProperties.getOrPut(name) {

@@ -14,7 +14,7 @@ class MapModel(varName: String, type: KSType, isSource: Boolean) :
 
     var valueType = getMapValueType(type)!!
 
-    override fun getProperty(name: String): Property? {
+    override fun getProperty(name: String): Property {
         return MapProperty(name, valueType)
     }
 
@@ -25,9 +25,6 @@ class MapModel(varName: String, type: KSType, isSource: Boolean) :
     override fun createTargetGetter(propertyName: String): GetterInvokeInfo {
         throw NotImplementedError()
     }
-
-    private fun String.wrap(isNullable: Boolean) =
-        if (isNullable) this else "requireNotNull($this)"
 
     override fun createSourceGetterInvokeChain(
         propertyNames: Collection<String>,

@@ -5,7 +5,6 @@ import com.github.afezeria.ktmapping.defaultConstructor
 import com.github.afezeria.ktmapping.property.Property
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
-import com.squareup.kotlinpoet.TypeName
 
 sealed class ValidModel(
     /**
@@ -38,11 +37,4 @@ sealed class ValidModel(
         targetType: KSType,
     ): GetterInvokeInfo
 
-    protected fun String.wrap(typeName: TypeName? = null): String {
-        return replace("(.*\\?:.*)".toRegex(), "(\$1)") + (typeName?.let { " as %T" } ?: "")
-    }
-
-    protected fun String.wrap(ksType: KSType? = null): String {
-        return replace("(.*\\?:.*)".toRegex(), "(\$1)") + (ksType?.let { " as %T" } ?: "")
-    }
 }

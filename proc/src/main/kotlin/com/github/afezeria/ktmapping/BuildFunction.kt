@@ -11,19 +11,15 @@ import com.squareup.kotlinpoet.TypeName
  *
  * @date 2021/8/16
  */
-class BuildFunction private constructor(val fn: KSFunctionDeclaration) {
-    var builder: FunSpec.Builder
-
-    init {
-        builder = FunSpec.builder(fn.simpleName.asString())
-            .addModifiers(KModifier.OVERRIDE)
-            .returns(fn.returnType!!.className())
-            .also { spec ->
-                fn.parameters.forEach {
-                    spec.addParameter(ParameterSpec(it.nameStr, it.type.className()))
-                }
+class BuildFunction private constructor(private val fn: KSFunctionDeclaration) {
+    var builder: FunSpec.Builder = FunSpec.builder(fn.simpleName.asString())
+        .addModifiers(KModifier.OVERRIDE)
+        .returns(fn.returnType!!.className())
+        .also { spec ->
+            fn.parameters.forEach {
+                spec.addParameter(ParameterSpec(it.nameStr, it.type.className()))
             }
-    }
+        }
 
     fun build(): FunSpec {
         return if (ctx.isUpdateFunction) {
@@ -80,9 +76,6 @@ class BuildFunction private constructor(val fn: KSFunctionDeclaration) {
                     UpdatePolicy.TARGET_IS_NULL -> {
                         val (targetGetterStr, _, nullable) = ctx.targetModel.createTargetGetter(
                             property.name)
-//                        val (targetGetterStr, _, nullable) =
-//                            ctx.targetModel.createSourceGetterInvokeChain(listOf(property.name),
-//                                property.type)
                         if (nullable) {
                             val tmpVarName = property.name + "Tmp"
                             builder.addStatement("val $tmpVarName = $targetGetterStr",
@@ -96,12 +89,6 @@ class BuildFunction private constructor(val fn: KSFunctionDeclaration) {
                     }
                     UpdatePolicy.SOURCE_IS_NOT_NULL -> {
                         val tmpVarName = property.name + "Tmp"
-                        val type =
-                            if (ctx.sourceModel is EntityModel) {
-                                emptyList()
-                            } else {
-                                listOf(property.type.className(true))
-                            }
 
                         if (isNullable) {
                             if (ctx.sourceModel is EntityModel) {

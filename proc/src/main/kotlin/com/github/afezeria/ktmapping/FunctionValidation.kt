@@ -11,9 +11,8 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
  *
  * @date 2021/8/13
  */
-class FunctionValidation private constructor(val fn: KSFunctionDeclaration) {
+class FunctionValidation private constructor(private val fn: KSFunctionDeclaration) {
     private var explicitMappings: MutableList<Mapping> = mutableListOf()
-    private var isUpdateFunction: Boolean = false
     private lateinit var targetModel: ValidModel
     private lateinit var sourceModel: ValidModel
 

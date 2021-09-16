@@ -23,9 +23,6 @@ class ResultSetModel(varName: String, type: KSType, isSource: Boolean) :
         throw NotImplementedError()
     }
 
-    private fun String.wrap(isNullable: Boolean) =
-        if (isNullable) this else "requireNotNull($this)"
-
     override fun createSourceGetterInvokeChain(
         propertyNames: Collection<String>,
         targetType: KSType,

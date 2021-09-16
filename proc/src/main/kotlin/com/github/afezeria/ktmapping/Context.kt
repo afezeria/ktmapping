@@ -26,7 +26,7 @@ lateinit var mapDeclaration: KSClassDeclaration
 lateinit var iterableDeclaration: KSClassDeclaration
 lateinit var resultSetDeclaration: KSClassDeclaration
 lateinit var mappingAnnotationDeclaration: KSClassDeclaration
-lateinit var iocAnnotationKSFile: KSFile
+//lateinit var iocAnnotationKSFile: KSFile
 
 var ctx: Context = Context()
 

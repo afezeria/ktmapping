@@ -21,7 +21,6 @@ class KtMappingProcessor(val environment: SymbolProcessorEnvironment) : SymbolPr
         for (declaration in resolver.getSymbolsWithAnnotation(Mapper::class.qualifiedName!!)
             .filterIsInstance<KSClassDeclaration>()) {
 
-//            val fileSpec = createFileSpec(declaration) ?: continue
             val fileSpec = BuildMapper(declaration) ?: continue
 
             environment.codeGenerator.createNewFile(
@@ -46,13 +45,12 @@ class KtMappingProcessor(val environment: SymbolProcessorEnvironment) : SymbolPr
         iterableDeclaration = gresolver.getClassDeclarationByName("kotlin.collections.Iterable")!!
         mappingAnnotationDeclaration =
             requireNotNull(gresolver.getClassDeclarationByName<Mapping>()) { "未引入ktmapping" }
-        val a = requireNotNull(gresolver.getClassDeclarationByName(iocAnnotation.canonicalName)) {
+        requireNotNull(gresolver.getClassDeclarationByName(iocAnnotation.canonicalName)) {
             "未引入spring-context"
         }
         resultSetCanProvideTypeSet =
             resultSetCanProvideClasses.map { resolver.getClassDeclarationByName(it.qualifiedName!!)!! }
                 .toSet()
-        println()
 
     }
 

@@ -75,7 +75,6 @@ fun <T : Annotation> KSAnnotated.getAnnotations(clazz: KClass<T>): List<T> {
             it.annotationType.resolve().declaration == gresolver.getClassDeclarationByName(clazz.qualifiedName!!)
         }
         .map { ann ->
-            println()
             val map = clazz.constructors.first().parameters.mapNotNull { param ->
                 ann.arguments.find { it.name!!.asString() == param.name }
                     ?.value
@@ -84,10 +83,12 @@ fun <T : Annotation> KSAnnotated.getAnnotations(clazz: KClass<T>): List<T> {
                             val first = it.first()
                             val items =
                                 if (first is KSType && (first.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY) {
-                                    it.map { getEnumEntry(it as KSType) }
+                                    it.map { type -> getEnumEntry(type as KSType) }
                                 } else {
                                     it
                                 }
+
+                            @Suppress("UNCHECKED_CAST")
                             val array = java.lang.reflect.Array.newInstance(
                                 items[0].javaClass,
                                 items.size
@@ -112,6 +113,7 @@ fun <T : Annotation> KSAnnotated.getAnnotations(clazz: KClass<T>): List<T> {
 }
 
 fun getEnumEntry(type: KSType): Enum<*> {
+    @Suppress("UNCHECKED_CAST")
     val enumClazz =
         Class.forName(
             (type.declaration as KSClassDeclaration).parentDeclaration!!.qualifiedName!!.asString()
@@ -130,9 +132,6 @@ val KSType.name
     get() = declaration.simpleName.asString()
 val KSType.qualifierName
     get() = declaration.qualifiedName!!.asString()
-
-fun main() {
-}
 
 val KSValueParameter.nameStr
     get() = name!!.asString()
