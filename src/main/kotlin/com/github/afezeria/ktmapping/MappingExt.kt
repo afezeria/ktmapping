@@ -3,6 +3,7 @@ package com.github.afezeria.ktmapping
 import java.sql.ResultSet
 import java.sql.SQLException
 
+
 object MappingExt {
 
     inline fun <reified T : Any> _getNullable(rs: ResultSet, vararg keys: String): T? {

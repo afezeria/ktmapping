@@ -175,4 +175,131 @@ public class InterfaceTestImpl : InterfaceTest {
         diff(compilation.getGeneratedCode(), str)
     }
 
+    @Test
+    fun excludeSourceMapping() {
+        val kotlinSource = template("""
+            @ExcludeMapping(targetMappings = ["age", "id"])
+            fun abc(b: Map<String,Any>): A
+        """)
+
+        val compilation = createKotlinCompilation(kotlinSource)
+        val result = compilation.compile()
+
+        assert(result.exitCode == KotlinCompilation.ExitCode.OK)
+
+        compilation.printGeneratedFile()
+
+        @Language("kotlin")
+        val str = """
+package com.github.afezeria.ktmapping
+
+import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
+import kotlin.Any
+import kotlin.String
+import kotlin.collections.Map
+import org.springframework.stereotype.Component
+
+@Component
+public class InterfaceTestImpl : InterfaceTest {
+    public override fun abc(b: Map<String, Any>): A {
+        val result = A(_get(b, "account"), _get(b, "name"), _get(b, "password"))
+        result.createById = _get(b, "createById")
+        result.createDate = _get(b, "createDate")
+        result.name = _get(b, "name")
+        result.password = _get(b, "password")
+        return result
+    }
+}
+
+                """.trimIndent()
+
+        diff(compilation.getGeneratedCode(), str)
+    }
+    @Test
+    fun excludeTargetMapping() {
+        val kotlinSource = template("""
+            @ExcludeMapping(targetMappings = ["age", "id"])
+            fun abc(b: Map<String,Any>): A
+        """)
+
+        val compilation = createKotlinCompilation(kotlinSource)
+        val result = compilation.compile()
+
+        assert(result.exitCode == KotlinCompilation.ExitCode.OK)
+
+        compilation.printGeneratedFile()
+
+        @Language("kotlin")
+        val str = """
+package com.github.afezeria.ktmapping
+
+import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
+import kotlin.Any
+import kotlin.String
+import kotlin.collections.Map
+import org.springframework.stereotype.Component
+
+@Component
+public class InterfaceTestImpl : InterfaceTest {
+    public override fun abc(b: Map<String, Any>): A {
+        val result = A(_get(b, "account"), _get(b, "name"), _get(b, "password"))
+        result.createById = _get(b, "createById")
+        result.createDate = _get(b, "createDate")
+        result.name = _get(b, "name")
+        result.password = _get(b, "password")
+        return result
+    }
+}
+
+                """.trimIndent()
+
+        diff(compilation.getGeneratedCode(), str)
+    }
+    @Test
+    fun excludeTarget() {
+        val kotlinSource = template("""
+            @MapperConfig(
+                sourceNameStyle = [NamingStyle.SNAKE_CASE, NamingStyle.CAMEL_CASE],
+                mappingPolicy = MappingPolicy.FIRST_NOT_NULL
+            )
+            @ExcludeMapping(targetMappings = ["age"], sourceMappings = ["id", "create_by_id"])
+            fun abc(b: Map<String,Any>): A
+        """)
+
+        val compilation = createKotlinCompilation(kotlinSource)
+        val result = compilation.compile()
+
+        assert(result.exitCode == KotlinCompilation.ExitCode.OK)
+
+        compilation.printGeneratedFile()
+
+        @Language("kotlin")
+        val str = """
+package com.github.afezeria.ktmapping
+
+import com.github.afezeria.ktmapping.MappingExt._get
+import com.github.afezeria.ktmapping.MappingExt._getNullable
+import kotlin.Any
+import kotlin.String
+import kotlin.collections.Map
+import org.springframework.stereotype.Component
+
+@Component
+public class InterfaceTestImpl : InterfaceTest {
+    public override fun abc(b: Map<String, Any>): A {
+        val result = A(_get(b, "account"), _get(b, "name"), _get(b, "password"))
+        result.createById = _get(b, "createById")
+        result.createDate = _get(b, "create_date", "createDate")
+        result.name = _get(b, "name")
+        result.password = _get(b, "password")
+        return result
+    }
+}
+
+                """.trimIndent()
+
+        diff(compilation.getGeneratedCode(), str)
+    }
 }

@@ -33,6 +33,17 @@ annotation class MapperConfig(
 
 
 /**
+ * 从映射关系中排除指定属性
+ * [target]/[source] 中的字符串对应的属性名在映射中不存在时将会编译失败
+ */
+@Target(AnnotationTarget.FUNCTION)
+annotation class ExcludeMapping(
+    val sourceMappings: Array<String> = [],
+    val targetMappings: Array<String> = [],
+)
+
+
+/**
  * 显示指定映射关系
  *
  * [source] String 来源属性名

@@ -43,7 +43,7 @@ open class Context(
     lateinit var fileSpecBuilder: FileSpec.Builder
     var isUpdateFunction: Boolean = false
     var reflectHelperProperties: MutableMap<String, PropertySpec> = mutableMapOf()
-    var target2Sources: Map<String, Collection<String>> = emptyMap()
+    var target2Sources: MutableMap<String, MutableSet<String>> = mutableMapOf()
 
 
     companion object {

@@ -82,17 +82,18 @@ fun <T : Annotation> KSAnnotated.getAnnotations(clazz: KClass<T>): List<T> {
                     ?.let {
                         val value = if (it is ArrayList<*> && it.isNotEmpty()) {
                             val first = it.first()
-                            if (first is KSType && (first.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY) {
-                                val entries = it.map { getEnumEntry(it as KSType) }
-                                val array = java.lang.reflect.Array.newInstance(
-                                    entries[0].javaClass,
-                                    entries.size
-                                ) as Array<Any>
-                                entries.forEachIndexed { index, enum -> array[index] = enum }
-                                array
-                            } else {
-                                it
-                            }
+                            val items =
+                                if (first is KSType && (first.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY) {
+                                    it.map { getEnumEntry(it as KSType) }
+                                } else {
+                                    it
+                                }
+                            val array = java.lang.reflect.Array.newInstance(
+                                items[0].javaClass,
+                                items.size
+                            ) as Array<Any>
+                            items.forEachIndexed { index, enum -> array[index] = enum }
+                            array
                         } else if (it is KSType && (it.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY) {
                             getEnumEntry(it)
                         } else {
@@ -101,7 +102,12 @@ fun <T : Annotation> KSAnnotated.getAnnotations(clazz: KClass<T>): List<T> {
                         param to value
                     }
             }.toMap()
-            clazz.constructors.first().callBy(map)
+            try {
+                clazz.constructors.first().callBy(map)
+            } catch (e: Exception) {
+                println()
+                throw e
+            }
         }.toList()
 }
 

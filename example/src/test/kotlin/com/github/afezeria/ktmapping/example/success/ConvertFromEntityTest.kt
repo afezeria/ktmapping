@@ -81,4 +81,79 @@ public class InterfaceTestImpl : InterfaceTest {
         val generatedCode = compilation.getGeneratedCode()
         diff(generatedCode, str)
     }
+
+    @Test
+    fun excludeSourceMapping() {
+        val kotlinSource = template("""
+            @ExcludeMapping(sourceMappings = ["age"])
+            fun abc(b: B): A
+        """)
+
+        val compilation = createKotlinCompilation(kotlinSource)
+        val result = compilation.compile()
+
+        assert(result.exitCode == KotlinCompilation.ExitCode.OK)
+
+        compilation.printGeneratedFile()
+        requireNotNull("") { "" }
+        requireNotNull("")
+
+        @Language("kotlin")
+        val str = """
+package com.github.afezeria.ktmapping
+
+import org.springframework.stereotype.Component
+
+@Component
+public class InterfaceTestImpl : InterfaceTest {
+    public override fun abc(b: B): A {
+        val result = A(b.account, b.name, b.password)
+        result.name = b.name
+        result.password = b.password
+        return result
+    }
+}
+
+                """.trimIndent()
+
+        val generatedCode = compilation.getGeneratedCode()
+        diff(generatedCode, str)
+    }
+    @Test
+    fun excludeTargetMapping() {
+        val kotlinSource = template("""
+            @ExcludeMapping(targetMappings = ["age"])
+            fun abc(b: B): A
+        """)
+
+        val compilation = createKotlinCompilation(kotlinSource)
+        val result = compilation.compile()
+
+        assert(result.exitCode == KotlinCompilation.ExitCode.OK)
+
+        compilation.printGeneratedFile()
+        requireNotNull("") { "" }
+        requireNotNull("")
+
+        @Language("kotlin")
+        val str = """
+package com.github.afezeria.ktmapping
+
+import org.springframework.stereotype.Component
+
+@Component
+public class InterfaceTestImpl : InterfaceTest {
+    public override fun abc(b: B): A {
+        val result = A(b.account, b.name, b.password)
+        result.name = b.name
+        result.password = b.password
+        return result
+    }
+}
+
+                """.trimIndent()
+
+        val generatedCode = compilation.getGeneratedCode()
+        diff(generatedCode, str)
+    }
 }

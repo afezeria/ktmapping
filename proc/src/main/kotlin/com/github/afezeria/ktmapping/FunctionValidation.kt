@@ -16,7 +16,6 @@ class FunctionValidation private constructor(val fn: KSFunctionDeclaration) {
     private var isUpdateFunction: Boolean = false
     private lateinit var targetModel: ValidModel
     private lateinit var sourceModel: ValidModel
-    private lateinit var target2SourceSet: MutableMap<String, MutableSet<String>>
 
     fun test(): Boolean {
         return isDefault()
@@ -149,10 +148,42 @@ class FunctionValidation private constructor(val fn: KSFunctionDeclaration) {
 
     private fun mappingCheck(): Boolean {
         setMapping()
+        if (!excludeMapping()) {
+            return false
+        }
         if (!ctx.isUpdateFunction && !constructorParameterCheck()) {
             return false
         }
         return propertyCheck()
+    }
+
+    /**
+     * 从映射关系中排除指定属性
+     * @return Boolean
+     */
+    private fun excludeMapping(): Boolean {
+        var result = true
+
+        fn.getAnnotations<ExcludeMapping>().firstOrNull()?.let {
+            for (sourceMapping in it.sourceMappings) {
+                var exist = false
+                ctx.target2Sources.entries.removeIf { (_, set) ->
+                    exist = exist || set.remove(sourceMapping)
+                    set.isEmpty()
+                }
+                if (!exist) {
+                    logger.error("Missing target mapping:$sourceMapping", fn)
+                    result = false
+                }
+            }
+            for (targetMapping in it.targetMappings) {
+                ctx.target2Sources.remove(targetMapping) ?: run {
+                    logger.error("Missing source mapping:$targetMapping", fn)
+                    result = false
+                }
+            }
+        }
+        return result
     }
 
     /**
@@ -198,6 +229,7 @@ class FunctionValidation private constructor(val fn: KSFunctionDeclaration) {
      * 设置映射关系
      */
     private fun setMapping() {
+        val target2SourceSet: MutableMap<String, MutableSet<String>>
         if (sourceModel is MapModel || sourceModel is ResultSetModel) {
             target2SourceSet = targetModel.properties
                 .filter { it.hasSetter }.associateTo(mutableMapOf()) {
@@ -254,7 +286,7 @@ class FunctionValidation private constructor(val fn: KSFunctionDeclaration) {
                 }
             }
         }
-        ctx.target2Sources = target2SourceSet.filter { it.value.isNotEmpty() }
+        ctx.target2Sources = target2SourceSet.filterTo(mutableMapOf()) { it.value.isNotEmpty() }
     }
 
     companion object {
