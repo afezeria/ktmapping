@@ -19,10 +19,6 @@ annotation class Mapper
  * [mappingPolicy] 规则生效策略
  *
  * [sourceNameStyle] 从map映射到实体类时，实体类中的属性对应的map中的属性的命名规则
- *
- * [targetNameStyle] 从实体类映射到map时，实体类中的属性对应的map中的属性的命名规则
- *
- * [targetLateinitFieldPolicy] lateinit字段处理规则
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 annotation class MapperConfig(
@@ -34,7 +30,7 @@ annotation class MapperConfig(
 
 /**
  * 从映射关系中排除指定属性
- * [target]/[source] 中的字符串对应的属性名在映射中不存在时将会编译失败
+ * [sourceMappings]/[targetMappings] 中的字符串对应的属性名在映射中不存在时将会编译失败
  */
 @Target(AnnotationTarget.FUNCTION)
 annotation class ExcludeMapping(
