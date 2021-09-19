@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.jdbc.core.JdbcTemplate
 import java.time.LocalDateTime
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -123,6 +122,26 @@ class MapTest {
             assert(a.valInt == map["b"])
             assert(a.varString == map["c"])
             assert(a.valNullString == map["d"])
+        }
+
+        @Test
+        fun excludeMapping() {
+            val map = mapOf(
+                "valString" to "abc",
+                "valInt" to 2,
+                "varString" to "aaa",
+                "e" to "ee",
+                "lateinitLocalDateTime" to LocalDateTime.now(),
+            )
+            val a = ampper.c5(map)
+            assert(a.valString == map["valString"])
+            assert(a.valInt == map["valInt"])
+            assert(a.varString == map["varString"])
+            assert(a.valNullString == map["valNullString"])
+            assert(a.e == null)
+            assertFailsWith<UninitializedPropertyAccessException> {
+                a.lateinitLocalDateTime != map["lateinitLocalDateTime"]
+            }
         }
     }
 

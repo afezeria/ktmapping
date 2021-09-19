@@ -27,6 +27,9 @@ interface AMapper {
     @Mapping(source = "d", target = "valNullString")
     fun c4(m: Map<String, Any?>): A
 
+    @ExcludeMapping(targetMappings = ["e", "lateinitLocalDateTime"])
+    fun c5(m: Map<String, Any?>): A
+
     fun u1(m: Map<String, Any?>, a: A)
 
     @MapperConfig(UpdatePolicy.SOURCE_IS_NOT_NULL)

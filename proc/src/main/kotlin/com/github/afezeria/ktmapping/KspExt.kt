@@ -79,36 +79,36 @@ fun <T : Annotation> KSAnnotated.getAnnotations(clazz: KClass<T>): List<T> {
                 ann.arguments.find { it.name!!.asString() == param.name }
                     ?.value
                     ?.let {
-                        val value = if (it is ArrayList<*> && it.isNotEmpty()) {
-                            val first = it.first()
-                            val items =
-                                if (first is KSType && (first.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY) {
-                                    it.map { type -> getEnumEntry(type as KSType) }
+                        when {
+                            it is ArrayList<*> -> {
+                                if (it.isEmpty()) {
+                                    null
                                 } else {
-                                    it
-                                }
+                                    val first = it.first()
+                                    val items =
+                                        if (first is KSType && (first.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY) {
+                                            it.map { type -> getEnumEntry(type as KSType) }
+                                        } else {
+                                            it
+                                        }
 
-                            @Suppress("UNCHECKED_CAST")
-                            val array = java.lang.reflect.Array.newInstance(
-                                items[0].javaClass,
-                                items.size
-                            ) as Array<Any>
-                            items.forEachIndexed { index, enum -> array[index] = enum }
-                            array
-                        } else if (it is KSType && (it.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY) {
-                            getEnumEntry(it)
-                        } else {
-                            it
+                                    @Suppress("UNCHECKED_CAST")
+                                    val array = java.lang.reflect.Array.newInstance(
+                                        items[0].javaClass,
+                                        items.size
+                                    ) as Array<Any>
+                                    items.forEachIndexed { index, enum -> array[index] = enum }
+                                    param to array
+                                }
+                            }
+                            it is KSType && (it.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_ENTRY -> {
+                                param to getEnumEntry(it)
+                            }
+                            else -> param to it
                         }
-                        param to value
                     }
             }.toMap()
-            try {
-                clazz.constructors.first().callBy(map)
-            } catch (e: Exception) {
-                println()
-                throw e
-            }
+            clazz.constructors.first().callBy(map)
         }.toList()
 }
 
