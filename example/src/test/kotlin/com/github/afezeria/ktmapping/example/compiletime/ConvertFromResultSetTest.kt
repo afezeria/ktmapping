@@ -1,4 +1,4 @@
-package com.github.afezeria.ktmapping.example.success
+package com.github.afezeria.ktmapping.example.compiletime
 
 import com.github.afezeria.ktmapping.example.createKotlinCompilation
 import com.github.afezeria.ktmapping.example.diff

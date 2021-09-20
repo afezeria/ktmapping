@@ -1,4 +1,4 @@
-package com.github.afezeria.ktmapping.example.success
+package com.github.afezeria.ktmapping.example.compiletime
 
 import com.github.afezeria.ktmapping.example.*
 import com.tschuchort.compiletesting.KotlinCompilation
@@ -10,38 +10,51 @@ import org.junit.jupiter.api.Test
  *
  * @date 2021/8/6
  */
-class UpdateFromResultSetTest {
+class UpdateFromEntityTest {
     fun template(fn: String): SourceFile = SourceFile.kotlin(
         "test.kt",
         """
 package com.github.afezeria.ktmapping
 
 import JavaA
-import java.sql.ResultSet
 import java.time.LocalDateTime
 
 @Mapper
 interface InterfaceTest {
 $fn
-    fun def() {}
 }
+
 
 class A(val account: String, var name: String, var password: String) {
     var id: String? = null
     var age: Int? = null
+    val address: String? = null
     lateinit var createById: String
     lateinit var createDate: LocalDateTime
+    lateinit var modifyById: String
+    lateinit var modifyDate: LocalDateTime
 }
 
-"""
+data class B(
+    val account: String,
+    val name: String,
+    val password: String,
+    val age: Int? = null,
+    val address: String? = null,
+    var updateDate: LocalDateTime,
+) {
+    lateinit var modifyById: String
+    lateinit var modifyDate: LocalDateTime
+}
+
+
+            """
     )
 
     @Test
     fun simple() {
         val kotlinSource = template(
-            """
-    fun abc(m: ResultSet, a: A)
-            """
+            "    fun abc(b: B,a: A)"
         )
 
         val compilation = createKotlinCompilation(kotlinSource)
@@ -55,21 +68,17 @@ class A(val account: String, var name: String, var password: String) {
         val str = """
 package com.github.afezeria.ktmapping
 
-import com.github.afezeria.ktmapping.MappingExt._get
-import com.github.afezeria.ktmapping.MappingExt._getNullable
-import java.sql.ResultSet
 import kotlin.Unit
 import org.springframework.stereotype.Component
 
 @Component
 public class InterfaceTestImpl : InterfaceTest {
-    public override fun abc(m: ResultSet, a: A): Unit {
-        a.id = _getNullable(m, "id")
-        a.age = _getNullable(m, "age")
-        a.createById = _get(m, "createById")
-        a.createDate = _get(m, "createDate")
-        a.name = _get(m, "name")
-        a.password = _get(m, "password")
+    public override fun abc(b: B, a: A): Unit {
+        a.age = b.age
+        a.modifyById = b.modifyById
+        a.modifyDate = b.modifyDate
+        a.name = b.name
+        a.password = b.password
     }
 }
 
@@ -79,16 +88,19 @@ public class InterfaceTestImpl : InterfaceTest {
         diff(generatedCode, str)
     }
 
+
     @Test
     fun config1() {
         val kotlinSource = template(
             """
     @MapperConfig(updatePolicy = UpdatePolicy.UPDATE_ALL)
-    fun u1(rs: ResultSet, a: A)
+    fun abc(b: B, a: A)
             """
         )
 
-        val compilation = createKotlinCompilation(kotlinSource)
+        val javaSource = getJavaSource("JavaA.java")
+
+        val compilation = createKotlinCompilation(kotlinSource, javaSource)
         val result = compilation.compile()
 
         assert(result.exitCode == KotlinCompilation.ExitCode.OK)
@@ -99,21 +111,17 @@ public class InterfaceTestImpl : InterfaceTest {
         val str = """
 package com.github.afezeria.ktmapping
 
-import com.github.afezeria.ktmapping.MappingExt._get
-import com.github.afezeria.ktmapping.MappingExt._getNullable
-import java.sql.ResultSet
 import kotlin.Unit
 import org.springframework.stereotype.Component
 
 @Component
 public class InterfaceTestImpl : InterfaceTest {
-    public override fun u1(rs: ResultSet, a: A): Unit {
-        a.id = _getNullable(rs, "id")
-        a.age = _getNullable(rs, "age")
-        a.createById = _get(rs, "createById")
-        a.createDate = _get(rs, "createDate")
-        a.name = _get(rs, "name")
-        a.password = _get(rs, "password")
+    public override fun abc(b: B, a: A): Unit {
+        a.age = b.age
+        a.modifyById = b.modifyById
+        a.modifyDate = b.modifyDate
+        a.name = b.name
+        a.password = b.password
     }
 }
 
@@ -128,11 +136,13 @@ public class InterfaceTestImpl : InterfaceTest {
         val kotlinSource = template(
             """
     @MapperConfig(updatePolicy = UpdatePolicy.SOURCE_IS_NOT_NULL)
-    fun u2(rs: ResultSet, a: A)
+    fun abc(b: B, a: A)
             """
         )
 
-        val compilation = createKotlinCompilation(kotlinSource)
+        val javaSource = getJavaSource("JavaA.java")
+
+        val compilation = createKotlinCompilation(kotlinSource, javaSource)
         val result = compilation.compile()
 
         assert(result.exitCode == KotlinCompilation.ExitCode.OK)
@@ -143,42 +153,35 @@ public class InterfaceTestImpl : InterfaceTest {
         val str = """
 package com.github.afezeria.ktmapping
 
-import com.github.afezeria.ktmapping.MappingExt._get
-import com.github.afezeria.ktmapping.MappingExt._getNullable
-import java.sql.ResultSet
+import java.lang.reflect.Field
 import java.time.LocalDateTime
-import kotlin.Int
 import kotlin.String
 import kotlin.Unit
 import org.springframework.stereotype.Component
 
 @Component
 public class InterfaceTestImpl : InterfaceTest {
-    public override fun u2(rs: ResultSet, a: A): Unit {
-        val idTmp: String? = _getNullable(rs, "id")
-        if (idTmp != null) {
-            a.id = idTmp
-        }
-        val ageTmp: Int? = _getNullable(rs, "age")
+    private val com_github_afezeria_ktmapping_B_modifyById: Field =
+            B::class.java.getField("modifyById")
+
+    private val com_github_afezeria_ktmapping_B_modifyDate: Field =
+            B::class.java.getField("modifyDate")
+
+    public override fun abc(b: B, a: A): Unit {
+        val ageTmp = b.age
         if (ageTmp != null) {
             a.age = ageTmp
         }
-        val createByIdTmp: String? = _getNullable(rs, "createById")
-        if (createByIdTmp != null) {
-            a.createById = createByIdTmp
+        val modifyByIdTmp = com_github_afezeria_ktmapping_B_modifyById.get(b) as String?
+        if (modifyByIdTmp != null) {
+            a.modifyById = modifyByIdTmp
         }
-        val createDateTmp: LocalDateTime? = _getNullable(rs, "createDate")
-        if (createDateTmp != null) {
-            a.createDate = createDateTmp
+        val modifyDateTmp = com_github_afezeria_ktmapping_B_modifyDate.get(b) as LocalDateTime?
+        if (modifyDateTmp != null) {
+            a.modifyDate = modifyDateTmp
         }
-        val nameTmp: String? = _getNullable(rs, "name")
-        if (nameTmp != null) {
-            a.name = nameTmp
-        }
-        val passwordTmp: String? = _getNullable(rs, "password")
-        if (passwordTmp != null) {
-            a.password = passwordTmp
-        }
+        a.name = b.name
+        a.password = b.password
     }
 }
 
@@ -193,13 +196,14 @@ public class InterfaceTestImpl : InterfaceTest {
         val kotlinSource = template(
             """
     @MapperConfig(updatePolicy = UpdatePolicy.TARGET_IS_NULL)
-    @Mapping(source = "updateDate", target = "createDate")
-    fun u3(rs: ResultSet, a: A)
-
+    @Mapping(source = "updateDate", target = "modifyDate")
+    fun abc(b: B, a: A)
             """
         )
 
-        val compilation = createKotlinCompilation(kotlinSource)
+        val javaSource = getJavaSource("JavaA.java")
+
+        val compilation = createKotlinCompilation(kotlinSource, javaSource)
         val result = compilation.compile()
 
         assert(result.exitCode == KotlinCompilation.ExitCode.OK)
@@ -210,40 +214,33 @@ public class InterfaceTestImpl : InterfaceTest {
         val str = """
 package com.github.afezeria.ktmapping
 
-import com.github.afezeria.ktmapping.MappingExt._get
-import com.github.afezeria.ktmapping.MappingExt._getNullable
 import java.lang.reflect.Field
-import java.sql.ResultSet
 import kotlin.Unit
 import org.springframework.stereotype.Component
 
 @Component
 public class InterfaceTestImpl : InterfaceTest {
-    private val com_github_afezeria_ktmapping_A_createById: Field =
-            A::class.java.getField("createById")
+    private val com_github_afezeria_ktmapping_A_modifyById: Field =
+            A::class.java.getField("modifyById")
 
-    private val com_github_afezeria_ktmapping_A_createDate: Field =
-            A::class.java.getField("createDate")
+    private val com_github_afezeria_ktmapping_A_modifyDate: Field =
+            A::class.java.getField("modifyDate")
 
-    public override fun u3(rs: ResultSet, a: A): Unit {
-        val idTmp = a.id
-        if (idTmp == null) {
-            a.id = _getNullable(rs, "id")
-        }
+    public override fun abc(b: B, a: A): Unit {
         val ageTmp = a.age
         if (ageTmp == null) {
-            a.age = _getNullable(rs, "age")
+            a.age = b.age
         }
-        val createByIdTmp = com_github_afezeria_ktmapping_A_createById.get(a)
-        if (createByIdTmp == null) {
-            a.createById = _get(rs, "createById")
+        val modifyByIdTmp = com_github_afezeria_ktmapping_A_modifyById.get(a)
+        if (modifyByIdTmp == null) {
+            a.modifyById = b.modifyById
         }
-        val createDateTmp = com_github_afezeria_ktmapping_A_createDate.get(a)
-        if (createDateTmp == null) {
-            a.createDate = _get(rs, "updateDate")
+        val modifyDateTmp = com_github_afezeria_ktmapping_A_modifyDate.get(a)
+        if (modifyDateTmp == null) {
+            a.modifyDate = b.updateDate
         }
-        a.name = _get(rs, "name")
-        a.password = _get(rs, "password")
+        a.name = b.name
+        a.password = b.password
     }
 }
 
@@ -258,13 +255,14 @@ public class InterfaceTestImpl : InterfaceTest {
         val kotlinSource = template(
             """
     @MapperConfig(updatePolicy = UpdatePolicy.TARGET_IS_NULL, mappingPolicy = MappingPolicy.FIRST_NOT_NULL)
-    @Mapping(source = "updateDate", target = "createDate")
-    fun u4(rs: ResultSet, a: A)
-
+    @Mapping(source = "updateDate", target = "modifyDate")
+    fun abc(b: B, a: A)
             """
         )
 
-        val compilation = createKotlinCompilation(kotlinSource)
+        val javaSource = getJavaSource("JavaA.java")
+
+        val compilation = createKotlinCompilation(kotlinSource, javaSource)
         val result = compilation.compile()
 
         assert(result.exitCode == KotlinCompilation.ExitCode.OK)
@@ -275,40 +273,42 @@ public class InterfaceTestImpl : InterfaceTest {
         val str = """
 package com.github.afezeria.ktmapping
 
-import com.github.afezeria.ktmapping.MappingExt._get
-import com.github.afezeria.ktmapping.MappingExt._getNullable
 import java.lang.reflect.Field
-import java.sql.ResultSet
+import java.time.LocalDateTime
+import kotlin.String
 import kotlin.Unit
 import org.springframework.stereotype.Component
 
 @Component
 public class InterfaceTestImpl : InterfaceTest {
-    private val com_github_afezeria_ktmapping_A_createById: Field =
-            A::class.java.getField("createById")
+    private val com_github_afezeria_ktmapping_B_modifyById: Field =
+            B::class.java.getField("modifyById")
 
-    private val com_github_afezeria_ktmapping_A_createDate: Field =
-            A::class.java.getField("createDate")
+    private val com_github_afezeria_ktmapping_A_modifyById: Field =
+            A::class.java.getField("modifyById")
 
-    public override fun u4(rs: ResultSet, a: A): Unit {
-        val idTmp = a.id
-        if (idTmp == null) {
-            a.id = _getNullable(rs, "id")
-        }
+    private val com_github_afezeria_ktmapping_B_modifyDate: Field =
+            B::class.java.getField("modifyDate")
+
+    private val com_github_afezeria_ktmapping_A_modifyDate: Field =
+            A::class.java.getField("modifyDate")
+
+    public override fun abc(b: B, a: A): Unit {
         val ageTmp = a.age
         if (ageTmp == null) {
-            a.age = _getNullable(rs, "age")
+            a.age = b.age
         }
-        val createByIdTmp = com_github_afezeria_ktmapping_A_createById.get(a)
-        if (createByIdTmp == null) {
-            a.createById = _get(rs, "createById")
+        val modifyByIdTmp = com_github_afezeria_ktmapping_A_modifyById.get(a)
+        if (modifyByIdTmp == null) {
+            a.modifyById = com_github_afezeria_ktmapping_B_modifyById.get(b) as String
         }
-        val createDateTmp = com_github_afezeria_ktmapping_A_createDate.get(a)
-        if (createDateTmp == null) {
-            a.createDate = _get(rs, "createDate", "updateDate")
+        val modifyDateTmp = com_github_afezeria_ktmapping_A_modifyDate.get(a)
+        if (modifyDateTmp == null) {
+            a.modifyDate = (com_github_afezeria_ktmapping_B_modifyDate.get(b) ?: b.updateDate) as
+                    LocalDateTime
         }
-        a.name = _get(rs, "name")
-        a.password = _get(rs, "password")
+        a.name = b.name
+        a.password = b.password
     }
 }
 
@@ -323,13 +323,14 @@ public class InterfaceTestImpl : InterfaceTest {
         val kotlinSource = template(
             """
     @MapperConfig(updatePolicy = UpdatePolicy.TARGET_IS_NULL, mappingPolicy = MappingPolicy.ONLY_EXPLICIT)
-    @Mapping(source = "updateDate", target = "createDate")
-    fun u5(rs: ResultSet, a: A)
-
+    @Mapping(source = "updateDate", target = "modifyDate")
+    fun abc(b: B, a: A)
             """
         )
 
-        val compilation = createKotlinCompilation(kotlinSource)
+        val javaSource = getJavaSource("JavaA.java")
+
+        val compilation = createKotlinCompilation(kotlinSource, javaSource)
         val result = compilation.compile()
 
         assert(result.exitCode == KotlinCompilation.ExitCode.OK)
@@ -340,22 +341,19 @@ public class InterfaceTestImpl : InterfaceTest {
         val str = """
 package com.github.afezeria.ktmapping
 
-import com.github.afezeria.ktmapping.MappingExt._get
-import com.github.afezeria.ktmapping.MappingExt._getNullable
 import java.lang.reflect.Field
-import java.sql.ResultSet
 import kotlin.Unit
 import org.springframework.stereotype.Component
 
 @Component
 public class InterfaceTestImpl : InterfaceTest {
-    private val com_github_afezeria_ktmapping_A_createDate: Field =
-            A::class.java.getField("createDate")
+    private val com_github_afezeria_ktmapping_A_modifyDate: Field =
+            A::class.java.getField("modifyDate")
 
-    public override fun u5(rs: ResultSet, a: A): Unit {
-        val createDateTmp = com_github_afezeria_ktmapping_A_createDate.get(a)
-        if (createDateTmp == null) {
-            a.createDate = _get(rs, "updateDate")
+    public override fun abc(b: B, a: A): Unit {
+        val modifyDateTmp = com_github_afezeria_ktmapping_A_modifyDate.get(a)
+        if (modifyDateTmp == null) {
+            a.modifyDate = b.updateDate
         }
     }
 }
@@ -371,12 +369,12 @@ public class InterfaceTestImpl : InterfaceTest {
         val kotlinSource = template(
             """
     @MapperConfig(updatePolicy = UpdatePolicy.TARGET_IS_NULL)
-    fun ju1(rs: ResultSet, a: JavaA)
-
+    fun ju1(b: B, a: JavaA)
             """
         )
 
         val javaSource = getJavaSource("JavaA.java")
+
         val compilation = createKotlinCompilation(kotlinSource, javaSource)
         val result = compilation.compile()
 
@@ -389,54 +387,39 @@ public class InterfaceTestImpl : InterfaceTest {
 package com.github.afezeria.ktmapping
 
 import JavaA
-import com.github.afezeria.ktmapping.MappingExt._get
-import com.github.afezeria.ktmapping.MappingExt._getNullable
-import java.sql.ResultSet
 import kotlin.Unit
 import org.springframework.stereotype.Component
 
 @Component
 public class InterfaceTestImpl : InterfaceTest {
-    public override fun ju1(rs: ResultSet, a: JavaA): Unit {
+    public override fun ju1(b: B, a: JavaA): Unit {
         val accountTmp = a.account
         if (accountTmp == null) {
-            a.account = _getNullable(rs, "account")
+            a.account = b.account
         }
         val nameTmp = a.name
         if (nameTmp == null) {
-            a.name = _getNullable(rs, "name")
+            a.name = b.name
         }
         val passwordTmp = a.password
         if (passwordTmp == null) {
-            a.password = _getNullable(rs, "password")
-        }
-        val idTmp = a.id
-        if (idTmp == null) {
-            a.id = _getNullable(rs, "id")
+            a.password = b.password
         }
         val ageTmp = a.age
         if (ageTmp == null) {
-            a.age = _getNullable(rs, "age")
+            a.age = b.age
         }
         val addressTmp = a.address
         if (addressTmp == null) {
-            a.address = _getNullable(rs, "address")
-        }
-        val createByIdTmp = a.createById
-        if (createByIdTmp == null) {
-            a.createById = _getNullable(rs, "createById")
-        }
-        val createDateTmp = a.createDate
-        if (createDateTmp == null) {
-            a.createDate = _getNullable(rs, "createDate")
+            a.address = b.address
         }
         val modifyByIdTmp = a.modifyById
         if (modifyByIdTmp == null) {
-            a.modifyById = _getNullable(rs, "modifyById")
+            a.modifyById = b.modifyById
         }
         val modifyDateTmp = a.modifyDate
         if (modifyDateTmp == null) {
-            a.modifyDate = _getNullable(rs, "modifyDate")
+            a.modifyDate = b.modifyDate
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.github.afezeria.ktmapping.example.success
+package com.github.afezeria.ktmapping.example.compiletime
 
 import com.github.afezeria.ktmapping.example.createKotlinCompilation
 import com.github.afezeria.ktmapping.example.diff
@@ -95,8 +95,6 @@ public class InterfaceTestImpl : InterfaceTest {
         assert(result.exitCode == KotlinCompilation.ExitCode.OK)
 
         compilation.printGeneratedFile()
-        requireNotNull("") { "" }
-        requireNotNull("")
 
         @Language("kotlin")
         val str = """
@@ -119,6 +117,7 @@ public class InterfaceTestImpl : InterfaceTest {
         val generatedCode = compilation.getGeneratedCode()
         diff(generatedCode, str)
     }
+
     @Test
     fun excludeTargetMapping() {
         val kotlinSource = template("""

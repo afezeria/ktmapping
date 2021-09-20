@@ -1,8 +1,8 @@
-package com.github.afezeria.ktmapping.example.spring
+package com.github.afezeria.ktmapping.example.runtime
 
 import com.github.afezeria.ktmapping.MappingException
 import com.github.afezeria.ktmapping.example.A
-import com.github.afezeria.ktmapping.example.AMapper
+import com.github.afezeria.ktmapping.example.MapMapper
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +20,7 @@ import kotlin.test.assertFailsWith
 class MapTest {
 
     @Autowired
-    lateinit var ampper: AMapper
+    lateinit var mapper: MapMapper
 
     @Nested
     inner class SimpleConvert {
@@ -33,7 +33,7 @@ class MapTest {
                 "e" to "ee",
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
-            val a = ampper.c1(map)
+            val a = mapper.c1(map)
             assert(a.valString == map["valString"])
             assert(a.valInt == map["valInt"])
             assert(a.varString == map["varString"])
@@ -52,7 +52,7 @@ class MapTest {
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
             val ex = assertFailsWith<MappingException> {
-                ampper.c1(map)
+                mapper.c1(map)
             }
             assertContains(ex.message!!,
                 "[key:valInt] class java.lang.String cannot be cast to class java.lang.Integer")
@@ -68,7 +68,7 @@ class MapTest {
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
             val ex = assertFailsWith<MappingException> {
-                ampper.c1(map)
+                mapper.c1(map)
             }
             assertEquals(ex.message!!, "Required varString was null")
         }
@@ -86,7 +86,7 @@ class MapTest {
                 "e" to "ee",
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
-            val a = ampper.c2(map)
+            val a = mapper.c2(map)
             assert(a.valString == map["s1"])
         }
 
@@ -100,7 +100,7 @@ class MapTest {
                 "e" to "ee",
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
-            val a = ampper.c3(map)
+            val a = mapper.c3(map)
             assert(a.valString == map["s2"])
         }
 
@@ -117,7 +117,7 @@ class MapTest {
                 "e" to "ee",
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
-            val a = ampper.c4(map)
+            val a = mapper.c4(map)
             assert(a.valString == map["a"])
             assert(a.valInt == map["b"])
             assert(a.varString == map["c"])
@@ -133,7 +133,7 @@ class MapTest {
                 "e" to "ee",
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
-            val a = ampper.c5(map)
+            val a = mapper.c5(map)
             assert(a.valString == map["valString"])
             assert(a.valInt == map["valInt"])
             assert(a.varString == map["varString"])
@@ -158,7 +158,7 @@ class MapTest {
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
             val a = A(valString = "", valInt = 0, varString = "", valNullString = null)
-            ampper.u1(map, a)
+            mapper.u1(map, a)
             assert(a.valString != map["valString"])
             assert(a.valInt != map["valInt"])
             assert(a.varString == map["varString"])
@@ -177,7 +177,7 @@ class MapTest {
             )
             val a = A(valString = "", valInt = 0, varString = "", valNullString = null)
             val ex = assertFailsWith<MappingException> {
-                ampper.u1(map, a)
+                mapper.u1(map, a)
             }
             assert(ex.message!! == "Required varString was null")
         }
@@ -190,7 +190,7 @@ class MapTest {
                 "lateinitLocalDateTime" to LocalDateTime.now(),
             )
             val a = A(valString = "", valInt = 0, varString = "", valNullString = null)
-            ampper.u2(map, a)
+            mapper.u2(map, a)
             assert(a.varString != map["varString"])
             assert(a.e == map["e"])
             assert(a.lateinitLocalDateTime == map["lateinitLocalDateTime"])
@@ -207,7 +207,7 @@ class MapTest {
                 e = "e"
                 lateinitLocalDateTime = LocalDateTime.now()
             }
-            ampper.u3(map, a)
+            mapper.u3(map, a)
             assert(a.varString == map["varString"])
             assert(a.e != map["e"])
             assert(a.lateinitLocalDateTime != map["lateinitLocalDateTime"])

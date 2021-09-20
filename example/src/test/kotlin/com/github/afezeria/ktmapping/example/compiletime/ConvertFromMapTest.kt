@@ -1,4 +1,4 @@
-package com.github.afezeria.ktmapping.example.success
+package com.github.afezeria.ktmapping.example.compiletime
 
 import com.github.afezeria.ktmapping.example.createKotlinCompilation
 import com.github.afezeria.ktmapping.example.diff
@@ -216,6 +216,7 @@ public class InterfaceTestImpl : InterfaceTest {
 
         diff(compilation.getGeneratedCode(), str)
     }
+
     @Test
     fun excludeTargetMapping() {
         val kotlinSource = template("""
@@ -257,6 +258,7 @@ public class InterfaceTestImpl : InterfaceTest {
 
         diff(compilation.getGeneratedCode(), str)
     }
+
     @Test
     fun excludeTarget() {
         val kotlinSource = template("""

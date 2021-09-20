@@ -1,13 +1,24 @@
 package com.github.afezeria.ktmapping.example
 
 import com.github.afezeria.ktmapping.*
+import java.time.LocalDateTime
 
 /**
  *
  * @date 2021/9/8
  */
+class A(
+    val valString: String,
+    val valInt: Int,
+    var varString: String,
+    val valNullString: String? = null,
+) {
+    var e: String? = null
+    lateinit var lateinitLocalDateTime: LocalDateTime
+}
+
 @Mapper
-interface AMapper {
+interface MapMapper {
     fun c1(m: Map<String, Any>): A
 
     @MapperConfig(mappingPolicy = MappingPolicy.FIRST_NOT_NULL)
