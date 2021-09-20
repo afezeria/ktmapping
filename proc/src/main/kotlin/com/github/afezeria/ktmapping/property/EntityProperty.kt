@@ -35,7 +35,7 @@ class EntityProperty(
             return true
         }
         logger.error(
-            "Incompatible property type. source: ${owner.type}.${name},target:${property.owner.type}.${property.name}",
+            "Incompatible property type. source: ${owner.type}.${name}, target: ${property.owner.type}.${property.name}",
             ctx.node
         )
         return false

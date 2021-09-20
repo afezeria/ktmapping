@@ -15,6 +15,7 @@ class EntityModel(varName: String, type: KSType, isSource: Boolean) :
     ValidModel(varName, type, isSource, true, true) {
 
     init {
+        val model = this
         type.classDeclaration.apply {
             properties = when (origin) {
                 Origin.KOTLIN, Origin.KOTLIN_LIB -> {
@@ -27,7 +28,9 @@ class EntityModel(varName: String, type: KSType, isSource: Boolean) :
                                 hasGetter = it.getter != null,
                                 hasSetter = it.setter != null,
                                 isLateinit = it.isLateinit(),
-                            )
+                            ).apply {
+                                owner = model
+                            }
                         }
                 }
                 Origin.JAVA, Origin.JAVA_LIB -> {
@@ -61,7 +64,9 @@ class EntityModel(varName: String, type: KSType, isSource: Boolean) :
                                     hasGetter = hasGetter,
                                     hasSetter = hasSetter,
                                     isLateinit = false
-                                )
+                                ).apply {
+                                    owner = model
+                                }
                             } else {
                                 null
                             }
