@@ -1,9 +1,6 @@
 package com.github.afezeria.ktmapping.property
 
-import com.github.afezeria.ktmapping.ctx
-import com.github.afezeria.ktmapping.ksType
-import com.github.afezeria.ktmapping.logger
-import com.github.afezeria.ktmapping.nameStr
+import com.github.afezeria.ktmapping.*
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 
@@ -15,9 +12,6 @@ class EntityProperty(
     hasSetter: Boolean,
     isLateinit: Boolean,
 ) : Property(name, type, isNullable, hasGetter, hasSetter, isLateinit) {
-    override fun isCompatibleType(ksType: KSType): Boolean {
-        return ksType.isAssignableFrom(type)
-    }
 
     override fun matchTargetParameter(param: KSValueParameter): Boolean {
         if (param.ksType.isAssignableFrom(type)) {

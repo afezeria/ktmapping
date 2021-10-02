@@ -8,9 +8,6 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 
 class MapProperty(name: String, type: KSType) : Property(name, type, true, true, true, false) {
-    override fun isCompatibleType(ksType: KSType): Boolean {
-        return type.isAssignableFrom(ksType)
-    }
 
     override fun matchTargetParameter(param: KSValueParameter): Boolean {
         if (type.isAssignableFrom(param.ksType)) {

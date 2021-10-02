@@ -7,10 +7,6 @@ import com.google.devtools.ksp.symbol.KSValueParameter
 
 class ResultSetProperty(name: String) :
     Property(name, gresolver.getClassDeclarationByName<Any>()!!.asType(emptyList()), true, true) {
-    override fun isCompatibleType(ksType: KSType): Boolean {
-
-        return resultSetCanProvideTypeSet.contains(ksType.classDeclaration)
-    }
 
     override fun matchTargetParameter(param: KSValueParameter): Boolean {
         if (resultSetCanProvideTypeSet.contains(param.ksType.classDeclaration)) {

@@ -13,7 +13,6 @@ sealed class Property(
     var isLateinit: Boolean = false,
 ) {
     lateinit var owner: ValidModel
-    abstract fun isCompatibleType(ksType: KSType): Boolean
     abstract fun matchTargetParameter(param: KSValueParameter): Boolean
     abstract fun matchTargetProperty(property: Property): Boolean
     override fun toString(): String {
