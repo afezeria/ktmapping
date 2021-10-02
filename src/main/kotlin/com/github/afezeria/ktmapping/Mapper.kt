@@ -13,17 +13,20 @@ annotation class Mapper
 
 /**
  * 映射规则配置
- *
- * [updatePolicy] 更新策略
- *
- * [mappingPolicy] 规则生效策略
- *
- * [sourceNameStyle] 从map映射到实体类时，实体类中的属性对应的map中的属性的命名规则
  */
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
 annotation class MapperConfig(
+    /**
+     * 更新策略
+     */
     val updatePolicy: UpdatePolicy = UPDATE_ALL,
+    /**
+     * 规则生效策略
+     */
     val mappingPolicy: MappingPolicy = LAST_DECLARE,
+    /**
+     * 从map映射到实体类时，实体类中的属性对应的map中的属性的命名规则
+     */
     val sourceNameStyle: Array<NamingStyle> = [CAMEL_CASE],
 )
 
@@ -52,38 +55,51 @@ annotation class ExcludeMapping(
 annotation class Mapping(val source: String, val target: String)
 
 /**
- * 映射规则生效策略
+ * 映射生效策略
  *
- * 当从对象映射到对象时，source中的属性为最先声明的规则
+ * 当从对象映射到对象时，source中的属性为最先声明的映射
  *
- * 当从map映射到对象时，target中的属性为最先声明的规则
- *
- * [LAST_DECLARE] 使用最后声明的规则
- *
- * [FIRST_NOT_NULL] 应用所有的规则，按照声明顺序从source取值，取到第一个不为null的值后结束，
- * 该选项假设所有的映射中至少有一个不为null，当[MapperConfig.updatePolicy]为[UpdatePolicy.SOURCE_IS_NOT_NULL]时，
- * 该选项不起作用
- *
- * [ONLY_EXPLICIT] 只应用使用mapping注解显示声明的规则，此时一个target中的属性只能对应到一个source中的属性
+ * 当从map映射到对象时，target中的属性为最先声明的映射
  */
 enum class MappingPolicy {
+    /**
+     * 使用最后声明的映射
+     */
     LAST_DECLARE,
+
+    /**
+     * 应用所有的映射，按照声明顺序从source取值，取到第一个不为null的值后结束
+     *
+     * 当转换为 entity->entity 的形式时，该选项允许编译期 T?->T 的映射，
+     * 非空检查被移动到运行时
+     *
+     * 该选项假设运行时所有的映射中至少有一个不为null
+     *
+     * 当[MapperConfig.updatePolicy]为[UpdatePolicy.SOURCE_IS_NOT_NULL]时该选项不起作用
+     */
     FIRST_NOT_NULL,
+    /**
+     * 只应用使用mapping注解显示声明的映射
+     * 此时一个target中的属性只能对应到一个source中的属性
+     */
     ONLY_EXPLICIT,
 }
 
 /**
  * 函数为更新时的属性覆盖策略
- *
- * [UPDATE_ALL] 更新全部可更新字段
- *
- * [TARGET_IS_NULL] 当target中对应属性为空时更新
- *
- * [SOURCE_IS_NOT_NULL] 当source中对应属性不为空时更新
  */
 enum class UpdatePolicy {
+    /**
+     * 更新全部可更新字段
+     */
     UPDATE_ALL,
+    /**
+     * 当target中对应属性为空时更新
+     */
     TARGET_IS_NULL,
+    /**
+     * 当source中对应属性不为空时更新
+     */
     SOURCE_IS_NOT_NULL,
 }
 
