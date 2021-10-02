@@ -18,8 +18,6 @@ val javaSources = File("src/test/resources").listFiles { f ->
     SourceFile.java(it.name, it.readText())
 }
 
-val jars = File("src/test/resources/jars").listFiles()!!
-
 val annotation =
     SourceFile.fromPath(File("../src/main/kotlin/com/github/afezeria/ktmapping/Mapper.kt"))
 
@@ -31,7 +29,7 @@ fun createKotlinCompilation(vararg sources: SourceFile): KotlinCompilation =
     KotlinCompilation().apply {
         this.sources = listOf(annotation, *sources)
         symbolProcessorProviders = listOf(KtMappingProcessor.Provider())
-        this.classpaths = jars.toList()
+        inheritClassPath = true
     }
 
 fun KotlinCompilation.printGeneratedFile() {
