@@ -25,8 +25,14 @@ class EntityProperty(
     }
 
     override fun matchTargetProperty(property: Property): Boolean {
-        if (property.type.isAssignableFrom(type)) {
-            return true
+        if (ctx.mappingPolicy == MappingPolicy.FIRST_NOT_NULL) {
+            if (property.type.isAssignableFrom(type.makeNotNullable())) {
+                return true
+            }
+        } else {
+            if (property.type.isAssignableFrom(type)) {
+                return true
+            }
         }
         logger.error(
             "Incompatible property type. source: ${owner.type}.${name}, target: ${property.owner.type}.${property.name}",

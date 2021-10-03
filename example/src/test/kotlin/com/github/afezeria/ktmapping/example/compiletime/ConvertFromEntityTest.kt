@@ -7,6 +7,7 @@ import com.github.afezeria.ktmapping.example.printGeneratedFile
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 /**
@@ -84,10 +85,12 @@ public class InterfaceTestImpl : InterfaceTest {
 
     @Test
     fun excludeSourceMapping() {
-        val kotlinSource = template("""
+        val kotlinSource = template(
+            """
             @ExcludeMapping(sourceMappings = ["age"])
             fun abc(b: B): A
-        """)
+        """
+        )
 
         val compilation = createKotlinCompilation(kotlinSource)
         val result = compilation.compile()
@@ -120,10 +123,12 @@ public class InterfaceTestImpl : InterfaceTest {
 
     @Test
     fun excludeTargetMapping() {
-        val kotlinSource = template("""
+        val kotlinSource = template(
+            """
             @ExcludeMapping(targetMappings = ["age"])
             fun abc(b: B): A
-        """)
+        """
+        )
 
         val compilation = createKotlinCompilation(kotlinSource)
         val result = compilation.compile()
@@ -131,8 +136,6 @@ public class InterfaceTestImpl : InterfaceTest {
         assert(result.exitCode == KotlinCompilation.ExitCode.OK)
 
         compilation.printGeneratedFile()
-        requireNotNull("") { "" }
-        requireNotNull("")
 
         @Language("kotlin")
         val str = """
@@ -154,5 +157,62 @@ public class InterfaceTestImpl : InterfaceTest {
 
         val generatedCode = compilation.getGeneratedCode()
         diff(generatedCode, str)
+    }
+
+    @Nested
+    inner class WithMappingPolicy {
+        @Test
+        fun firstNotNull() {
+            val kotlinSource = SourceFile.kotlin(
+                "test.kt", """
+package com.github.afezeria.ktmapping
+import java.time.LocalDateTime
+
+class B{
+    lateinit var createBy: String
+}
+
+class C(
+    var createBy: String? = null,
+    var createBy1: String? = null,
+)
+
+@Mapper
+interface InterfaceTest {
+    @MapperConfig(mappingPolicy = MappingPolicy.FIRST_NOT_NULL)
+    fun c(c: C): B
+}
+
+        """
+            )
+
+            val compilation = createKotlinCompilation(kotlinSource)
+            val result = compilation.compile()
+
+            assert(result.exitCode == KotlinCompilation.ExitCode.OK)
+
+            compilation.printGeneratedFile()
+
+            @Language("kotlin")
+            val str = """
+package com.github.afezeria.ktmapping
+
+import kotlin.String
+import org.springframework.stereotype.Component
+
+@Component
+public class InterfaceTestImpl : InterfaceTest {
+    public override fun c(c: C): B {
+        val result = B()
+        result.createBy = c.createBy as String
+        return result
+    }
+}
+
+                """.trimIndent()
+
+            val generatedCode = compilation.getGeneratedCode()
+            diff(generatedCode, str)
+        }
     }
 }
