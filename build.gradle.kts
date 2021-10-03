@@ -1,23 +1,19 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-
-    kotlin("jvm") version "1.5.30"
-    id("com.bnorm.power.kotlin-power-assert") version "0.10.0"
+    kotlin("jvm") version "1.5.31"
 }
 
 allprojects {
 
     apply {
         plugin("kotlin")
-        plugin("com.bnorm.power.kotlin-power-assert")
     }
 
     repositories {
         mavenCentral()
         maven("https://maven.google.com/")
     }
-
 
     group = "com.github.afezeria.ktmapping"
     version = "0.0.1"

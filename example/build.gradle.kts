@@ -1,8 +1,11 @@
+import  org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
-    id("com.google.devtools.ksp") version "1.5.30-1.0.0-beta08"
+    id("com.google.devtools.ksp") version "1.5.31-1.0.0"
     id("org.springframework.boot") version "2.5.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("plugin.spring") version "1.5.10"
+    kotlin("plugin.spring") version "1.5.31"
+    id("com.bnorm.power.kotlin-power-assert") version "0.10.0"
 }
 
 configure<com.bnorm.power.PowerAssertGradleExtension> {
@@ -16,9 +19,8 @@ configure<com.bnorm.power.PowerAssertGradleExtension> {
 }
 
 dependencies {
-    implementation("org.springframework:spring-context:5.3.9")
-    implementation(projects.ktmapping)
-    ksp(projects.proc)
+    testImplementation(projects.ktmapping)
+    kspTest(projects.proc)
 
     testImplementation(projects.proc)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -26,14 +28,17 @@ dependencies {
     testImplementation(kotlin("test-common"))
     testImplementation(kotlin("test-annotations-common"))
     testImplementation(kotlin("test-junit5"))
-    testImplementation("com.google.devtools.ksp:symbol-processing-api:1.5.30-1.0.0-beta08")
-    testImplementation("io.github.java-diff-utils:java-diff-utils:4.10")
+    testImplementation("com.google.devtools.ksp:symbol-processing-api:1.5.31-1.0.0")
+    testImplementation("io.github.java-diff-utils:java-diff-utils:4.11")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.4")
-    testImplementation("com.zaxxer:HikariCP:5.0.0")
-    testImplementation("org.postgresql:postgresql:42.2.23.jre7")
+    testImplementation("org.postgresql:postgresql:42.2.24.jre7")
     testImplementation("com.h2database:h2:1.4.200")
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.getByName<BootJar>("bootJar") {
+    enabled = false
 }
