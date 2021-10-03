@@ -1,5 +1,5 @@
 rootProject.name = "ktmapping"
-include("example", "proc")
+include("example", "processor")
 
 pluginManagement {
     repositories {
